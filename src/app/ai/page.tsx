@@ -6,10 +6,10 @@ export default function Home() {
   /* TODO: Add state variables */
   // Keep track of the classification result and the model loading status.
   const [result, setResult] = useState(null);
-  const [ready, setReady] = useState(null);
+  const [ready, setReady] = useState<boolean | null>(null);
 
   // Create a reference to the worker object.
-  const worker = useRef(null);
+  const worker = useRef<Worker | null>(null);
 
   // We use the `useEffect` hook to set up the worker as soon as the `App` component is mounted.
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function Home() {
 
     // Create a callback function for messages from the worker thread.
     // const onMessageReceived = (e) => { /* TODO: See below */};
-    const onMessageReceived = (e) => {
+    const onMessageReceived = (e: any) => {
       switch (e.data.status) {
         case 'initiate':
           setReady(false);
@@ -40,10 +40,10 @@ export default function Home() {
     worker.current.addEventListener('message', onMessageReceived);
 
     // Define a cleanup function for when the component is unmounted.
-    return () => worker.current.removeEventListener('message', onMessageReceived);
+    return () => worker.current?.removeEventListener('message', onMessageReceived);
   });
 
-  const classify = useCallback((text) => {
+  const classify = useCallback((text: string) => {
     if (worker.current) {
       worker.current.postMessage({ text });
     }
@@ -58,7 +58,7 @@ export default function Home() {
     type="text"
     placeholder="Enter text here"
     onInput={e => {
-        classify(e.target.value);
+        classify((e.target as any)?.value);
     }}
   />
 
